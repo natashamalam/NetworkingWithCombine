@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class AppViewController: UIViewController {
     
@@ -16,10 +17,16 @@ class AppViewController: UIViewController {
         return searchBar
     }()
     
-    private var moviesTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        return tableView
+    private var noContentView: NoContentView = {
+        let view = NoContentView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private lazy var moviesTableView: MovieTableView = {
+        let tableContainingView = MovieTableView(viewModel: viewModel)
+        tableContainingView.translatesAutoresizingMaskIntoConstraints = false
+        return tableContainingView
     }()
     
     private var verticalStackView: UIStackView = {
@@ -30,9 +37,11 @@ class AppViewController: UIViewController {
         return stackView
     }()
     
-    let viewModel: MoviesViewModel
+    private var cancellables: [AnyCancellable] = []
     
-    init(viewModel: MoviesViewModel = MoviesViewModel()) {
+    private let viewModel: MovieListViewModel
+    
+    init(viewModel: MovieListViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -43,8 +52,21 @@ class AppViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupSubViews()
+        
+        viewModel.$dataFetchCompleted.sink { [weak self] status in
+            switch status {
+            case .notDone:
+                self?.noContentView.show()
+                self?.moviesTableView.hide()
+            case .succeded:
+                self?.noContentView.hide()
+                self?.moviesTableView.show()
+            case .failed:
+                print("Will show another view with network error")
+                self?.moviesTableView.hide()
+            }
+        }.store(in: &cancellables)
     }
     
     func setupSubViews() {
@@ -53,13 +75,11 @@ class AppViewController: UIViewController {
         //search bar
         searchBar.delegate = self
         verticalStackView.addArrangedSubview(searchBar)
+
+        //no content view
+        verticalStackView.addArrangedSubview(noContentView)
         
-        //table view
-        moviesTableView.register(MovieDetailTableViewCell.self, forCellReuseIdentifier: "movieCell")
-        moviesTableView.dataSource = self
-        moviesTableView.delegate = self
-        
-        //stack bar
+        //stackView bar
         verticalStackView.addArrangedSubview(moviesTableView)
         view.addSubview(verticalStackView)
         
@@ -78,25 +98,8 @@ class AppViewController: UIViewController {
     }
 }
 
-extension AppViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfContent()
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "movieCell", for: indexPath) as? MovieDetailTableViewCell else {
-            return UITableViewCell()
-        }
-        cell.viewModel = try? viewModel.cellVM(at: indexPath.row)
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 45.0
-    }
-
-}
-
 extension AppViewController: UISearchBarDelegate {
-    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.loadMovies(search: "batman")
+    }
 }
