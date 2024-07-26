@@ -11,7 +11,8 @@ import Combine
 enum DataFetchStatus {
     case succeded
     case failed
-    case notDone
+    case noResult
+    
 }
 
 enum ContentError: Error {
@@ -20,7 +21,8 @@ enum ContentError: Error {
 
 class MovieListViewModel: ObservableObject {
     
-    @Published var dataFetchCompleted: DataFetchStatus = .notDone
+    @Published var dataFetchCompleted: DataFetchStatus = .noResult
+    
     var cellVMs: [MovieCellViewModel]
     
     var cancellables: Set<AnyCancellable> = []
@@ -41,10 +43,15 @@ class MovieListViewModel: ObservableObject {
                 switch completion {
                 case .finished:
                     print("Should update UI now")
-                    self?.cellVMs.forEach { cellVM in
-                        print(cellVM.titleString)
+                    if let cellVms = self?.cellVMs,
+                       cellVms.count > 0 {
+                        self?.cellVMs.forEach { cellVM in
+                            print(cellVM.titleString)
+                        }
+                        self?.dataFetchCompleted = .succeded
+                    } else {
+                        self?.dataFetchCompleted = .noResult
                     }
-                    self?.dataFetchCompleted = .succeded
                 case .failure(let error):
                     print("fetch failed due to \(error)")
                     self?.dataFetchCompleted = .failed

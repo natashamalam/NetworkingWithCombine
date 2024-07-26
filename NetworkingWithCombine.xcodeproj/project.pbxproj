@@ -12,8 +12,8 @@
 		0F4824B22C5223DA00A8CF60 /* MovieCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824B12C5223DA00A8CF60 /* MovieCellViewModel.swift */; };
 		0F4824B52C5332B400A8CF60 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824B42C5332B400A8CF60 /* String+Extensions.swift */; };
 		0F4824B72C533F4600A8CF60 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824B62C533F4600A8CF60 /* HTTPClient.swift */; };
-		0F4824B92C5351B700A8CF60 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824B82C5351B700A8CF60 /* NoContentView.swift */; };
 		0F4824BB2C5357B900A8CF60 /* MovieTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824BA2C5357B900A8CF60 /* MovieTableView.swift */; };
+		0F4824BD2C536CD100A8CF60 /* NoSearchResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4824BC2C536CD100A8CF60 /* NoSearchResultView.swift */; };
 		0F4BB1202C51F66700C9B9C7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F4BB11F2C51F66700C9B9C7 /* AppDelegate.swift */; };
 		0F4BB1292C51F66900C9B9C7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0F4BB1282C51F66900C9B9C7 /* Assets.xcassets */; };
 		0F4BB12C2C51F66900C9B9C7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0F4BB12A2C51F66900C9B9C7 /* LaunchScreen.storyboard */; };
@@ -27,8 +27,8 @@
 		0F4824B12C5223DA00A8CF60 /* MovieCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCellViewModel.swift; sourceTree = "<group>"; };
 		0F4824B42C5332B400A8CF60 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		0F4824B62C533F4600A8CF60 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
-		0F4824B82C5351B700A8CF60 /* NoContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
 		0F4824BA2C5357B900A8CF60 /* MovieTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieTableView.swift; sourceTree = "<group>"; };
+		0F4824BC2C536CD100A8CF60 /* NoSearchResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoSearchResultView.swift; sourceTree = "<group>"; };
 		0F4BB11C2C51F66700C9B9C7 /* NetworkingWithCombine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkingWithCombine.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0F4BB11F2C51F66700C9B9C7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0F4BB1282C51F66900C9B9C7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,9 +52,9 @@
 		0F4824AC2C521FF700A8CF60 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0F4824B82C5351B700A8CF60 /* NoContentView.swift */,
 				0F4824BA2C5357B900A8CF60 /* MovieTableView.swift */,
 				0F4824AD2C52203000A8CF60 /* MovieDetailTableViewCell.swift */,
+				0F4824BC2C536CD100A8CF60 /* NoSearchResultView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -212,10 +212,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F4824AE2C52203000A8CF60 /* MovieDetailTableViewCell.swift in Sources */,
-				0F4824B92C5351B700A8CF60 /* NoContentView.swift in Sources */,
 				0F4824B52C5332B400A8CF60 /* String+Extensions.swift in Sources */,
 				0F4824B72C533F4600A8CF60 /* HTTPClient.swift in Sources */,
 				0F4824B22C5223DA00A8CF60 /* MovieCellViewModel.swift in Sources */,
+				0F4824BD2C536CD100A8CF60 /* NoSearchResultView.swift in Sources */,
 				0F4824B02C5220CE00A8CF60 /* MovieListViewModel.swift in Sources */,
 				0F4BB1392C51F76800C9B9C7 /* AppViewController.swift in Sources */,
 				0F4BB1202C51F66700C9B9C7 /* AppDelegate.swift in Sources */,

@@ -10,6 +10,7 @@ import Combine
 
 class AppViewController: UIViewController {
     
+    // need to tie searchBar text with noSearchResultView's lastSearchedKeyword
     private var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.translatesAutoresizingMaskIntoConstraints = false
@@ -17,16 +18,16 @@ class AppViewController: UIViewController {
         return searchBar
     }()
     
-    private var noContentView: NoContentView = {
-        let view = NoContentView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
     private lazy var moviesTableView: MovieTableView = {
         let tableContainingView = MovieTableView(viewModel: viewModel)
         tableContainingView.translatesAutoresizingMaskIntoConstraints = false
         return tableContainingView
+    }()
+    
+    private var noSearchResultView: NoSearchResultView = {
+        let view = NoSearchResultView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private var verticalStackView: UIStackView = {
@@ -56,11 +57,11 @@ class AppViewController: UIViewController {
         
         viewModel.$dataFetchCompleted.sink { [weak self] status in
             switch status {
-            case .notDone:
-                self?.noContentView.show()
+            case .noResult:
+                self?.noSearchResultView.show(with: self?.searchBar.text ?? "")
                 self?.moviesTableView.hide()
             case .succeded:
-                self?.noContentView.hide()
+                self?.noSearchResultView.hide()
                 self?.moviesTableView.show()
             case .failed:
                 print("Will show another view with network error")
@@ -71,13 +72,17 @@ class AppViewController: UIViewController {
     
     func setupSubViews() {
         view.backgroundColor = .white
-        
+        noSearchResultView.retryAction = { [weak self] keyword in
+            if let keyword {
+                self?.viewModel.loadMovies(search: keyword)
+            }
+        }
         //search bar
         searchBar.delegate = self
         verticalStackView.addArrangedSubview(searchBar)
-
-        //no content view
-        verticalStackView.addArrangedSubview(noContentView)
+        
+        // no search result view
+        verticalStackView.addArrangedSubview(noSearchResultView)
         
         //stackView bar
         verticalStackView.addArrangedSubview(moviesTableView)
@@ -100,6 +105,6 @@ class AppViewController: UIViewController {
 
 extension AppViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.loadMovies(search: "batman")
+        viewModel.loadMovies(search: searchText)
     }
 }

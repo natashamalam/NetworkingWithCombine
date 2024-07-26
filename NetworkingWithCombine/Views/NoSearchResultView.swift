@@ -1,5 +1,5 @@
 //
-//  NoContentView.swift
+//  ContentErrorView.swift
 //  NetworkingWithCombine
 //
 //  Created by Alam, Mahjabin | Natasha | ECMPD on 2024/07/26.
@@ -7,13 +7,13 @@
 
 import UIKit
 
-class NoContentView: UIView {
-
+class NoSearchResultView: UIView {
+    
     var noContentLabel: UILabel = {
         var label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 20)
-        label.textColor = UIColor.black
-        label.text = "No Content Yet"
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = UIColor.red
+        label.text = "Result Not Found"
         label.setContentHuggingPriority(.required, for: .vertical)
         label.lineBreakMode = .byTruncatingTail
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -27,7 +27,20 @@ class NoContentView: UIView {
         imageView.image = UIImage(named: "no_content")
         return imageView
     }()
-
+    
+    var retryButton: UIButton = {
+        let button = UIButton()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitleColor(.white, for: .normal)
+        button.setTitle("Retry", for: .normal)
+        button.backgroundColor = UIColor.systemGreen
+        return button
+    }()
+    
+    var lastSearchedKeyword: String?
+    
+    var retryAction: ((String?) -> Void)?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubViews()
@@ -40,24 +53,45 @@ class NoContentView: UIView {
     private func setupSubViews() {
         self.addSubview(noContentImageView)
         self.addSubview(noContentLabel)
+        self.addSubview(retryButton)
+        
+        retryButton.addTarget(self, action: #selector(retry(_:)), for: .touchUpInside)
+       
         addLayoutConstraints()
     }
     
     private func addLayoutConstraints() {
         let constraints = [
             noContentImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            noContentImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            noContentImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor, constant: -40),
             noContentImageView.widthAnchor.constraint(equalToConstant: 200),
             noContentImageView.heightAnchor.constraint(equalTo: noContentImageView.widthAnchor),
             
             noContentLabel.topAnchor.constraint(equalTo: noContentImageView.bottomAnchor, constant: 20),
-            noContentLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor)
+            noContentLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            
+            retryButton.topAnchor.constraint(equalTo: noContentLabel.bottomAnchor, constant: 25),
+            retryButton.centerXAnchor.constraint(equalTo: noContentLabel.centerXAnchor),
+            retryButton.widthAnchor.constraint(equalToConstant: 200),
+            retryButton.heightAnchor.constraint(equalToConstant: 60)
         ]
         NSLayoutConstraint.activate(constraints)
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        retryButton.layer.cornerRadius = 5.0
+    }
+    
+    @objc func retry(_ sender: UIButton) {
+        if let lastSearchedKeyword {
+            retryAction?(lastSearchedKeyword)
+        }
+    }
+    
     //public API
-    func show() {
+    func show(with searchedKeyword: String) {
+        self.lastSearchedKeyword = searchedKeyword
         self.isHidden = false
     }
     func hide() {

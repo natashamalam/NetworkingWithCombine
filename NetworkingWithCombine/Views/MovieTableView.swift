@@ -51,7 +51,7 @@ class MovieTableView: UIView {
     //public API
     func show() {
         self.isHidden = false
-        reloadData()
+        self.reloadData()
     }
     
     func hide() {
