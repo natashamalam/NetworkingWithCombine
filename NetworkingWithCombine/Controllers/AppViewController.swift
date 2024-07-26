@@ -38,6 +38,8 @@ class AppViewController: UIViewController {
         return stackView
     }()
     
+    private let searchPassthroughSubject = PassthroughSubject<String, Never>()
+    
     private var cancellables: [AnyCancellable] = []
     
     private let viewModel: MovieListViewModel
@@ -68,6 +70,11 @@ class AppViewController: UIViewController {
                 self?.moviesTableView.hide()
             }
         }.store(in: &cancellables)
+        
+        searchPassthroughSubject.debounce(for: 0.5, scheduler: DispatchQueue.main)
+            .sink { search in
+                self.viewModel.loadMovies(search: search)
+            }.store(in: &cancellables)
     }
     
     func setupSubViews() {
@@ -105,6 +112,6 @@ class AppViewController: UIViewController {
 
 extension AppViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        viewModel.loadMovies(search: searchText)
+        searchPassthroughSubject.send(searchText)
     }
 }

@@ -43,11 +43,7 @@ class MovieListViewModel: ObservableObject {
                 switch completion {
                 case .finished:
                     print("Should update UI now")
-                    if let cellVms = self?.cellVMs,
-                       cellVms.count > 0 {
-                        self?.cellVMs.forEach { cellVM in
-                            print(cellVM.titleString)
-                        }
+                    if let cellVms = self?.cellVMs, cellVms.count > 0 {
                         self?.dataFetchCompleted = .succeded
                     } else {
                         self?.dataFetchCompleted = .noResult
