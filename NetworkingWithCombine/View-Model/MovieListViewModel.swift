@@ -27,10 +27,12 @@ class MovieListViewModel: ObservableObject {
     
     var cancellables: Set<AnyCancellable> = []
     
-    private var searchTextSubject = CurrentValueSubject<String, Never>("")
-    private var searchTextClearSubject = CurrentValueSubject<String, Never>("")
+    private var searchTextSubject = PassthroughSubject<String, Never>()
+    private var searchTextClearSubject = PassthroughSubject<String, Never>()
     
     private let httpClient: HTTPClient
+    
+    @Published var noContentLabel: String = ""
     
     init(httpClient: HTTPClient = HTTPClient()) {
         self.httpClient = httpClient
@@ -42,18 +44,20 @@ class MovieListViewModel: ObservableObject {
     private func subscribeToSearchSubject() {
         searchTextSubject.receive(on: DispatchQueue.main)
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
-            .sink { [weak self] searcheText in
-                self?.loadMovies(from: searcheText)
+            .sink { [weak self] searchText in
+                self?.loadMovies(from: searchText)
+                self?.noContentLabel = self?.cellVMs.count == 0 ? "No Content" : ""
             }.store(in: &cancellables)
     }
     
     private func subscribeToSearchTextClearSubject() {
         searchTextClearSubject.receive(on: DispatchQueue.main)
-            .sink { [weak self] searcheText in
-                self?.loadMovies(from: searcheText)
+            .sink { [weak self] searchText in
+                self?.loadMovies(from: searchText)
+                self?.noContentLabel = ""
             }.store(in: &cancellables)
     }
-    
+
     func search(with text: String) {
         searchTextSubject.send(text)
     }
@@ -64,6 +68,7 @@ class MovieListViewModel: ObservableObject {
     
     func loadMovies(from search: String) {
         do {
+            self.cellVMs = []
             let publisher = httpClient.fetchMovies(search: search)
             
             publisher.sink { [weak self] completion in

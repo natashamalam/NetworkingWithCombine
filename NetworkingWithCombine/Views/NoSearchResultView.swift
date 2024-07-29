@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class NoSearchResultView: UIView {
     
@@ -13,7 +14,6 @@ class NoSearchResultView: UIView {
         var label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = UIColor.red
-        label.text = "Result Not Found"
         label.setContentHuggingPriority(.required, for: .vertical)
         label.lineBreakMode = .byTruncatingTail
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -41,8 +41,12 @@ class NoSearchResultView: UIView {
     
     var retryAction: ((String?) -> Void)?
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    private let viewModel: MovieListViewModel
+    private var cancellables: [AnyCancellable] = []
+    
+    init(viewModel: MovieListViewModel) {
+        self.viewModel = viewModel
+        super.init(frame: .zero)
         setupSubViews()
     }
     
@@ -51,6 +55,10 @@ class NoSearchResultView: UIView {
     }
     
     private func setupSubViews() {
+        viewModel.$noContentLabel.sink { text in
+            self.noContentLabel.text = text
+        }.store(in: &cancellables)
+        
         self.addSubview(noContentImageView)
         self.addSubview(noContentLabel)
         self.addSubview(retryButton)

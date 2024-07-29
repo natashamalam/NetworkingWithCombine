@@ -24,8 +24,8 @@ class AppViewController: UIViewController {
         return tableContainingView
     }()
     
-    private var noSearchResultView: NoSearchResultView = {
-        let view = NoSearchResultView()
+    private lazy var noSearchResultView: NoSearchResultView = {
+        let view = NoSearchResultView(viewModel: viewModel)
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
