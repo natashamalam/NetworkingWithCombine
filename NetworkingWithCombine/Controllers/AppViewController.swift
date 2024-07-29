@@ -39,7 +39,7 @@ class AppViewController: UIViewController {
     }()
     
     private let searchPassthroughSubject = PassthroughSubject<String, Never>()
-    
+    private let searchBarClearPassthroughSubject = PassthroughSubject<String, Never>()
     private var cancellables: [AnyCancellable] = []
     
     private let viewModel: MovieListViewModel
@@ -72,9 +72,16 @@ class AppViewController: UIViewController {
         }.store(in: &cancellables)
         
         searchPassthroughSubject.debounce(for: 0.5, scheduler: DispatchQueue.main)
-            .sink { search in
-                self.viewModel.loadMovies(search: search)
+            .sink { searchText in
+                self.viewModel.loadMovies(search: searchText)
             }.store(in: &cancellables)
+        
+        searchBarClearPassthroughSubject
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] searchText in
+                self?.viewModel.loadMovies(search: searchText)
+            }
+            .store(in: &cancellables)
     }
     
     func setupSubViews() {
@@ -112,6 +119,10 @@ class AppViewController: UIViewController {
 
 extension AppViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        searchPassthroughSubject.send(searchText)
+        if searchText.isEmpty {
+            searchBarClearPassthroughSubject.send(searchText)
+        } else {
+            searchPassthroughSubject.send(searchText)
+        }
     }
 }
