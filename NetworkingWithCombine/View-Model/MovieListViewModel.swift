@@ -27,15 +27,42 @@ class MovieListViewModel: ObservableObject {
     
     var cancellables: Set<AnyCancellable> = []
     
+    private var searchTextSubject = CurrentValueSubject<String, Never>("")
+    private var searchTextClearSubject = CurrentValueSubject<String, Never>("")
     
     private let httpClient: HTTPClient
     
     init(httpClient: HTTPClient = HTTPClient()) {
         self.httpClient = httpClient
         self.cellVMs = [MovieCellViewModel]()
+        self.subscribeToSearchSubject()
+        self.subscribeToSearchTextClearSubject()
     }
     
-    func loadMovies(search: String) {
+    private func subscribeToSearchSubject() {
+        searchTextSubject.receive(on: DispatchQueue.main)
+            .debounce(for: 0.5, scheduler: DispatchQueue.main)
+            .sink { [weak self] searcheText in
+                self?.loadMovies(from: searcheText)
+            }.store(in: &cancellables)
+    }
+    
+    private func subscribeToSearchTextClearSubject() {
+        searchTextClearSubject.receive(on: DispatchQueue.main)
+            .sink { [weak self] searcheText in
+                self?.loadMovies(from: searcheText)
+            }.store(in: &cancellables)
+    }
+    
+    func search(with text: String) {
+        searchTextSubject.send(text)
+    }
+    
+    func clearText() {
+        searchTextClearSubject.send("")
+    }
+    
+    func loadMovies(from search: String) {
         do {
             let publisher = httpClient.fetchMovies(search: search)
             
@@ -58,14 +85,6 @@ class MovieListViewModel: ObservableObject {
                 }
             }.store(in: &cancellables)
         }
-    }
-    
-    private func loadDummyData() {
-        // load dummy data when fetch failed
-        let cellVMOne = MovieCellViewModel(movie: Movie(title: "John Hicks", year: "1988", imdbID: "12322", poster: "some_value"))
-        let cellVMTwo = MovieCellViewModel(movie: Movie(title: "Game of Throne", year: "1980", imdbID: "12922", poster: "some_value"))
-        let cellVMThree = MovieCellViewModel(movie: Movie(title: "Goergia and Giny", year: "1908", imdbID: "14322", poster: "some_value"))
-        self.cellVMs = [cellVMOne, cellVMTwo, cellVMThree]
     }
     
     func numberOfContent() -> Int {
